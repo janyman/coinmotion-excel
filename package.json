@@ -1,0 +1,15 @@
+{
+  "name": "coinmotion-excel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sheetjs": "^2.0.0",
+    "xlsx": "^0.17.4"
+  }
+}
