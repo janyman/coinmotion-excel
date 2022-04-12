@@ -1,5 +1,5 @@
 XLSX = require('xlsx');
-
+let util = require('util');
 const axios = require('axios');
 
 const getSellRateEur = async coin => {
@@ -138,6 +138,7 @@ const recalcBalance = (coin, transactionData) => {
     for (t of transactionData[coin]) {
         calcBalance += t.amount;
     }
+    return calcBalance;
 }
 
 
@@ -212,7 +213,7 @@ const main = async () => {
     sortTransactionDataFirstToLast(transactionData);
     let coin = 'BTC';
     let calcBalance= recalcBalance(coin, transactionData);
-    console.log(`${coin}: balance calculated from individual transactions ${calcBalance} versus last transaction's stated balance ${transactionData[coin][transactionData[coin].length-1].balance}`)
+    console.log(`${coin}: balance calculated from individual transactions ${calcBalance} versus last transaction's stated balance ${(transactionData[coin][transactionData[coin].length-1]).balance}`)
     let startGainCalcIndex = findZeroBalance(coin, transactionData);
     let currentRate = await getSellRateEur('BTC');
     handleFifoSelling(coin, transactionData, startGainCalcIndex, currentRate);
