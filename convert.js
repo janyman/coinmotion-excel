@@ -208,15 +208,42 @@ const handleFifoSelling = (coin, transactionData, startGainCalcIndex, currentRat
     }
 }
 
+/* This function first seeks the latest point in time when wallet had zero-balance. Then 
+it starts listing to Excel the transactions, in format required by Vero.fi calculator */
+const formatForExternalSheet = (coin, transactionData) => {
+    let startGainCalcIndex = findZeroBalance(coin, transactionData);
+    const transactions = transactionData[coin].slice(startGainCalcIndex);
+    transactionArray = [];
+    for (let t of transactions) {
+        //if (t.status !== 'Valmis') continue;
+        let buyRegexp = /osto/i;
+        let sellRegexp = /myynti/i;
+        if (t.type.match(buyRegexp)) {
+            transactionArray.push([t.date, 'Osto', t.amount, t.rate, t.rate * t.amount, "Coinmotion"]);
+        } else if (t.type.match(sellRegexp)) {
+            transactionArray.push([t.date, 'Myynti', -t.amount, t.rate, t.rate * -t.amount, "Coinmotion"]);
+        }
+        
+    }
+    
+    var workbook = XLSX.utils.book_new();
+    var worksheet = XLSX.utils.aoa_to_sheet(transactionArray, { cellDates: true });
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'transactions for Vero.fi');
+      XLSX.writeFile(workbook, 'out.xlsx', {cellDates: true});
+}
+
 const main = async () => {
     let transactionData = getTransactionsXLS('balances-testing.xls');
     sortTransactionDataFirstToLast(transactionData);
     let coin = 'BTC';
+    /*
     let calcBalance= recalcBalance(coin, transactionData);
     console.log(`${coin}: balance calculated from individual transactions ${calcBalance} versus last transaction's stated balance ${(transactionData[coin][transactionData[coin].length-1]).balance}`)
     let startGainCalcIndex = findZeroBalance(coin, transactionData);
     let currentRate = await getSellRateEur('BTC');
     handleFifoSelling(coin, transactionData, startGainCalcIndex, currentRate);
+    */
+    formatForExternalSheet(coin, transactionData);
 };
 
 main();
