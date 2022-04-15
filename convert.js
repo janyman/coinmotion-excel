@@ -235,14 +235,7 @@ const formatForExternalSheet = (coin, transactionData, outputFileName) => {
       XLSX.writeFile(workbook, outputFileName, {cellDates: true});
 }
 
-const main = async () => {
-    let sourceFile = 'balances-testing.xls';
-    const arguments = process.argv.slice(2);
-    if (!arguments[0]) {
-        console.warn('No transactions source file, using testing!');
-    } else {
-        sourceFile = arguments[0];
-    }
+const startConversion = async (sourceFile) => {
     let transactionData = getTransactionsXLS(sourceFile);
     sortTransactionDataFirstToLast(transactionData);
     /*
@@ -256,4 +249,4 @@ const main = async () => {
     formatForExternalSheet('ETH', transactionData);
 };
 
-main();
+module.exports = startConversion;
