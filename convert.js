@@ -210,7 +210,10 @@ const handleFifoSelling = (coin, transactionData, startGainCalcIndex, currentRat
 
 /* This function first seeks the latest point in time when wallet had zero-balance. Then 
 it starts listing to Excel the transactions, in format required by Vero.fi calculator */
-const formatForExternalSheet = (coin, transactionData) => {
+const formatForExternalSheet = (coin, transactionData, outputFileName) => {
+    if (!outputFileName) {
+        outputFileName = coin + '_transactions.xlsx';
+    }
     let startGainCalcIndex = findZeroBalance(coin, transactionData);
     const transactions = transactionData[coin].slice(startGainCalcIndex);
     transactionArray = [];
@@ -229,13 +232,19 @@ const formatForExternalSheet = (coin, transactionData) => {
     var workbook = XLSX.utils.book_new();
     var worksheet = XLSX.utils.aoa_to_sheet(transactionArray, { cellDates: true });
       XLSX.utils.book_append_sheet(workbook, worksheet, 'transactions for Vero.fi');
-      XLSX.writeFile(workbook, 'out.xlsx', {cellDates: true});
+      XLSX.writeFile(workbook, outputFileName, {cellDates: true});
 }
 
 const main = async () => {
-    let transactionData = getTransactionsXLS('balances-testing.xls');
+    let sourceFile = 'balances-testing.xls';
+    const arguments = process.argv.slice(2);
+    if (!arguments[0]) {
+        console.warn('No transactions source file, using testing!');
+    } else {
+        sourceFile = arguments[0];
+    }
+    let transactionData = getTransactionsXLS(sourceFile);
     sortTransactionDataFirstToLast(transactionData);
-    let coin = 'BTC';
     /*
     let calcBalance= recalcBalance(coin, transactionData);
     console.log(`${coin}: balance calculated from individual transactions ${calcBalance} versus last transaction's stated balance ${(transactionData[coin][transactionData[coin].length-1]).balance}`)
@@ -243,7 +252,8 @@ const main = async () => {
     let currentRate = await getSellRateEur('BTC');
     handleFifoSelling(coin, transactionData, startGainCalcIndex, currentRate);
     */
-    formatForExternalSheet(coin, transactionData);
+    formatForExternalSheet('BTC', transactionData);
+    formatForExternalSheet('ETH', transactionData);
 };
 
 main();
