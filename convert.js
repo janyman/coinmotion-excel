@@ -231,11 +231,11 @@ const formatForExternalSheet = (coin, transactionData, outputFileName) => {
     
     var workbook = XLSX.utils.book_new();
     var worksheet = XLSX.utils.aoa_to_sheet(transactionArray, { cellDates: true });
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'transactions for Vero.fi');
-      XLSX.writeFile(workbook, outputFileName, {cellDates: true});
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'transactions for Vero.fi');
+    XLSX.writeFile(workbook, outputFileName, {cellDates: true});
 }
 
-const startConversion = async (sourceFile) => {
+const startConversion = async (coin, sourceFile) => {
     let transactionData = getTransactionsXLS(sourceFile);
     sortTransactionDataFirstToLast(transactionData);
     /*
@@ -245,8 +245,7 @@ const startConversion = async (sourceFile) => {
     let currentRate = await getSellRateEur('BTC');
     handleFifoSelling(coin, transactionData, startGainCalcIndex, currentRate);
     */
-    formatForExternalSheet('BTC', transactionData);
-    formatForExternalSheet('ETH', transactionData);
+    formatForExternalSheet(coin, transactionData);
 };
 
 module.exports = startConversion;
